@@ -9,12 +9,20 @@ function City() {
   const { id } = useParams();
   const { getCity, currentCity, isLoading } = useCities();
 
+  const formatDate = (date) =>
+    new Intl.DateTimeFormat("en", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      weekday: "long",
+    }).format(new Date(date));
+
   useEffect(() => {
     getCity(id);
   }, [id]);
 
   const { cityName, emoji, date, notes } = currentCity;
-  if (!isLoading) return <Spinner />;
+  if (isLoading) return <Spinner />;
   return (
     <div className={styles.city}>
       <div className={styles.row}>

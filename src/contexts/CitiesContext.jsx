@@ -12,9 +12,10 @@ function CitiesProvider({ children }) {
     async function fetchCities() {
       try {
         setIsLoading(true);
-        const res = await fetch(`${BASE_URL}/cities/`);
+        const res = await fetch(`${BASE_URL}/cities`);
         const data = await res.json();
         setCities(data);
+        console.log(data);
       } catch {
         alert("Something wrong with fetching");
       } finally {
@@ -23,13 +24,35 @@ function CitiesProvider({ children }) {
     }
     fetchCities();
   }, []);
-
+  console.log(cities);
   async function getCity(id) {
     try {
       setIsLoading(true);
       const res = await fetch(`${BASE_URL}/cities/${id}`);
       const data = await res.json();
       setCurrentCity(data);
+      console.log(data);
+    } catch {
+      alert("Something wrong with fetching");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function createCity(newCity) {
+    console.log(newCity);
+    try {
+      setIsLoading(true);
+      const res = await fetch(`${BASE_URL}/cities`, {
+        method: "POST",
+        body: JSON.stringify(newCity),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+
+      setCities((cities) => [...cities, data]);
     } catch {
       alert("Something wrong with fetching");
     } finally {
@@ -38,14 +61,14 @@ function CitiesProvider({ children }) {
   }
 
   return (
-    <CitiesContext.Provider value={(cities, isLoading, currentCity, getCity)}>
+    <CitiesContext.Provider value={{ cities, isLoading, currentCity, getCity, createCity }}>
       {children}
     </CitiesContext.Provider>
   );
 }
 
 function useCities() {
-  const context = useContext(CitiesProvider);
+  const context = useContext(CitiesContext);
   if (context === undefined) throw new Error(" CitiesContext was defined outside");
   return context;
 }
